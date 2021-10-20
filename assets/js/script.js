@@ -167,23 +167,32 @@ let auditTask = function(taskEl) {
   }
 };
 
-//making lists sortable <3
+// periodically run auditTask to check due dates
+setInterval(function () {
+  $(".card .list-group-item").each(function(index, el) {
+    auditTask(el);
+  });
+}, 1800000);
+
+//making lists sortable and add styles w/ dropover class
 $(".card .list-group").sortable({
   connectWith: $(".card .list-group"),
   scroll:false,
   tolerance: "pointer",
   helper: "clone",
   activate: function(event) {
-    
+    $(this).addClass("dropover");
+    $(".bottom-trash").addClass("bottom-trash-drag");
   },
   deactivate: function(event) {
-    
+    $(this).removeClass("dropover");
+    $(".bottom-trash").removeClass("bottom-trash-drag");
   },
   over: function(event) {
-    
+    $(event.target).addClass("dropover-active");
   },
   out: function(event) {
-    
+    $(event.target).removeClass("dropover-active");
   },
   update: function(event) {
     //array to store the task data in
@@ -224,12 +233,13 @@ $("#trash").droppable({
   tolerance: "touch",
   drop: function(event, ui) {
     ui.draggable.remove();
+    $(".bottom-trash").removeClass("bottom-trash-active");
   },
   over: function(event, ui) {
-    
+    $(".bottom-trash").addClass("bottom-trash-active");
   },
   out: function(event, ui) {
-    
+    $(".bottom-trash").removeClass("bottom-trash-active");
   }
 });
 
@@ -247,7 +257,7 @@ $("#task-form-modal").on("shown.bs.modal", function() {
 });
 
 // save button in modal was clicked
-$("#task-form-modal .btn-primary").click(function() {
+$("#task-form-modal .btn-save").click(function() {
   // get form values
   var taskText = $("#modalTaskDescription").val();
   var taskDate = $("#modalDueDate").val();
